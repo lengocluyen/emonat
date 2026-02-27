@@ -51,6 +51,30 @@ Run the Node server behind HTTPS (recommended) and set:
 
 Then start with `npm run start`.
 
+Note: If you deploy the repo as static assets (e.g. on Vercel without the Node server), the UI lives at `/app/` (and `/` redirects to `/app/#/login`).
+
+### Deploy on Vercel (frontend + API + Postgres)
+
+This repo can run fully on Vercel by using Vercel Serverless Functions for the `/api/*` endpoints and a hosted Postgres database.
+
+1) Create a hosted Postgres database (Neon/Supabase/etc.) and copy its connection string as `DATABASE_URL` (often needs `?sslmode=require`).
+
+2) In Vercel → Project → Settings → Environment Variables, set (Production + Preview):
+- `DATABASE_URL` (Postgres connection string)
+- `JWT_SECRET` (a long random string)
+- `COOKIE_SECURE=1`
+
+3) Run the migration once against your hosted DB (from your machine):
+```bash
+cd server
+npm install
+npm run migrate
+```
+
+4) Deploy. The app should work at:
+- `https://YOUR_PROJECT.vercel.app/` (redirects to `/app/#/login`)
+- `https://YOUR_PROJECT.vercel.app/app/`
+
 ## Deploy to GitHub
 
 You can publish this project to your own GitHub repository with these steps:

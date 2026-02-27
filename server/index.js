@@ -610,6 +610,12 @@ app.get('/app/*', (req, res) => {
   return res.sendFile(path.join(appDir, 'index.html'));
 });
 
-app.listen(PORT, () => {
-  console.log(`Emonat server running: ${APP_ORIGIN}`);
-});
+// When deployed on Vercel, this module is executed inside a Serverless Function.
+// Never call `listen()` there; Vercel provides the HTTP server.
+if (!process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`Emonat server running: ${APP_ORIGIN}`);
+  });
+}
+
+export default app;
