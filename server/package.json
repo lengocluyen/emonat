@@ -1,0 +1,20 @@
+{
+  "name": "emonat-server",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node index.js",
+    "start": "node index.js",
+    "start:win": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/start-win.ps1",
+    "stop:win": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/stop-win.ps1",
+    "migrate": "node db/migrate.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cookie-parser": "^1.4.6",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2",
+    "pg": "^8.12.0"
+  }
+}

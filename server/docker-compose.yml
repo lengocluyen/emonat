@@ -1,0 +1,16 @@
+services:
+  db:
+    image: postgres:16
+    container_name: emonat-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: emonat
+      POSTGRES_USER: emonat
+      POSTGRES_PASSWORD: emonat
+    ports:
+      - "15432:5432"
+    volumes:
+      - emonat_pgdata:/var/lib/postgresql/data
+
+volumes:
+  emonat_pgdata:
