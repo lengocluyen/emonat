@@ -1,7 +1,9 @@
 {
   "version": 2,
   "routes": [
+    { "src": "/api/ping", "dest": "/api/ping.js" },
     { "src": "/api/(.*)", "dest": "/api/index.js" },
+    { "src": "/", "status": 302, "headers": { "Location": "/app/" } },
     { "handle": "filesystem" }
   ]
 }
