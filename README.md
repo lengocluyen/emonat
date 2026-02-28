@@ -1,11 +1,15 @@
 # Emonat
 
-Web-first prototype of the Emonat / NeuroTask idea in `spectaculations.md`.
+Web-first prototype of the Emonat / NeuroTask idea for graph-based tasks and lightweight “memory” per task.
+
+Demo: `https://emonat.vercel.app/`
+
+![Emonat screenshot](screen.png)
 
 ## What’s in this repo
 
-- `app/` — Frontend (served as static assets by the server)
-- `server/` — Node.js API + static hosting
+- `app/` — Frontend (static assets served under `/app/`)
+- `server/` — Node.js API + static hosting (Express + Postgres)
 
 ## Quick start (dev)
 
@@ -51,49 +55,26 @@ Run the Node server behind HTTPS (recommended) and set:
 
 Then start with `npm run start`.
 
-Note: If you deploy the repo as static assets (e.g. on Vercel without the Node server), the UI lives at `/app/` (and `/` redirects to `/app/#/login`).
+### Deploy on Vercel (recommended)
 
-### Deploy on Vercel (frontend + API + Postgres)
+This repo is designed to run on Vercel with:
+- Static UI at `/app/`
+- API at `/api/*` (Vercel Functions)
+- Postgres (recommended: Neon)
 
-This repo can run fully on Vercel by using Vercel Serverless Functions for the `/api/*` endpoints and a hosted Postgres database.
+1) Create a hosted Postgres database and copy its connection string as `DATABASE_URL` (Neon typically uses `?sslmode=require`).
 
-1) Create a hosted Postgres database (Neon/Supabase/etc.) and copy its connection string as `DATABASE_URL` (often needs `?sslmode=require`).
-
-2) In Vercel → Project → Settings → Environment Variables, set (Production + Preview):
-- `DATABASE_URL` (Postgres connection string)
-- `JWT_SECRET` (a long random string)
+2) In Vercel → Project → Settings → Environment Variables (Production + Preview), set:
+- `DATABASE_URL`
+- `JWT_SECRET` (long random string)
 - `COOKIE_SECURE=1`
 
-3) Run the migration once against your hosted DB (from your machine):
+3) Run the migration once against your hosted DB:
 ```bash
 cd server
 npm install
 npm run migrate
 ```
 
-4) Deploy. The app should work at:
-- `https://YOUR_PROJECT.vercel.app/` (redirects to `/app/#/login`)
-- `https://YOUR_PROJECT.vercel.app/app/`
-
-## Deploy to GitHub
-
-You can publish this project to your own GitHub repository with these steps:
-
-1. **Initialize a git repository (if not already):**
-   ```sh
-   git init
-   git add .
-   git commit -m "Initial commit"
-   ```
-2. **Create a new repository on GitHub:**
-   - Go to https://github.com/new
-   - Name your repo (e.g. `emonat`), set visibility, and create it.
-3. **Add the remote and push:**
-   Replace `YOUR_GITHUB_USERNAME` and `emonat` with your info:
-   ```sh
-   git remote add origin https://github.com/YOUR_GITHUB_USERNAME/emonat.git
-   git branch -M main
-   git push -u origin main
-   ```
-
-After pushing, you can connect this repo to Railway/Render for free cloud deployment (see below for deployment instructions).
+4) Deploy and open:
+- `https://YOUR_PROJECT.vercel.app/` (redirects to `/app/`)
