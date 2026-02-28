@@ -4,11 +4,11 @@ Web-first prototype of the Emonat / NeuroTask idea for graph-based tasks and lig
 
 ![Emonat logo](logo.jpg)
 
-Demo: `https://emonat.vercel.app/` (or `https://emonat.vercel.app/app/`)
+Demo: `https://emonat.vercel.app/` 
 
 Live demo: [emonat.vercel.app](https://emonat.vercel.app/)
 
-![Emonat screenshot](screen.png)
+![Emonat screenshot](screen.jpg)
 
 ## What’s in this repo
 
