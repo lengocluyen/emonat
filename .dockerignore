@@ -1,0 +1,5 @@
+server/node_modules
+server/.env
+server/*.log
+server/*.pid
+server/scripts

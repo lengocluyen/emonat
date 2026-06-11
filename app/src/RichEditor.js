@@ -11,7 +11,7 @@ import Placeholder from "https://esm.sh/@tiptap/extension-placeholder@2";
 
 const html = htm.bind(React.createElement);
 
-const EMPTY_DOC = "<p></p>";
+const EMPTY_RE = /^(\s|<p>\s*<\/p>|<br\s*\/?>)*$/;
 
 function ToolBtn({ onClick, active, title, children }) {
   return html`<button
@@ -45,7 +45,7 @@ export function RichEditor({ defaultContent = "", onChange, placeholder = "Write
     editorProps: { attributes: { class: "richContent" } },
     onUpdate({ editor }) {
       const h = editor.getHTML();
-      onChange?.(h === EMPTY_DOC ? "" : h);
+      onChange?.(EMPTY_RE.test(h) ? "" : h);
     },
   });
 
@@ -139,4 +139,14 @@ export function RichEditor({ defaultContent = "", onChange, placeholder = "Write
       <${EditorContent} editor=${editor} />
     </div>
   `;
+}
+
+export function RichViewer({ content, className = "" }) {
+  if (!content) {
+    return html`<span className="muted" style=${{ fontStyle: "italic" }}>No description</span>`;
+  }
+  return html`<div
+    className=${"richContent richViewer " + className}
+    dangerouslySetInnerHTML=${{ __html: content }}
+  />`;
 }

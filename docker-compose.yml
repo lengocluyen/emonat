@@ -1,0 +1,37 @@
+services:
+  db:
+    image: postgres:16
+    container_name: emonat-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: emonat
+      POSTGRES_USER: emonat
+      POSTGRES_PASSWORD: emonat
+    ports:
+      - "15432:5432"
+    volumes:
+      - emonat_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U emonat"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  server:
+    build: .
+    container_name: emonat-server
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "5173:5173"
+    environment:
+      PORT: "5173"
+      APP_ORIGIN: "http://localhost:5173"
+      DATABASE_URL: "postgresql://emonat:emonat@db:5432/emonat"
+      JWT_SECRET: "dev-secret-change-me"
+      COOKIE_SECURE: "0"
+
+volumes:
+  emonat_pgdata:

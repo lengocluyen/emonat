@@ -21,7 +21,7 @@
   dagre,
 } from "./vendor.js";
 
-import { RichEditor } from "./RichEditor.js";
+import { RichEditor, RichViewer } from "./RichEditor.js";
 
 const html = htm.bind(React.createElement);
 
@@ -331,6 +331,7 @@ function computeLockedNodeIds(nodes, edges) {
     const source = nodeById.get(edge.source);
     const target = nodeById.get(edge.target);
     if (!source || !target) continue;
+    if (source.type === "rootTask") continue;
 
     const sourceDone = source?.data?.status === "done";
     if (!sourceDone) locked.add(target.id);
@@ -842,6 +843,8 @@ function App() {
   const [tasks, setTasks] = useState([]);
   const [tasksLoading, setTasksLoading] = useState(false);
   const [taskEditor, setTaskEditor] = useState(null); // {mode: 'new'|'edit', task}
+  const [taskDetail, setTaskDetail] = useState(null); // task object shown in preview modal
+  const [autosaveStatus, setAutosaveStatus] = useState(null); // null | 'saving' | 'saved'
   const [stageEditor, setStageEditor] = useState(null); // {mode: 'new', name, description}
   const [selectedTaskId, setSelectedTaskId] = useState(null);
   const [taskSearch, setTaskSearch] = useState("");
@@ -854,6 +857,7 @@ function App() {
   const [boardMetaLoading, setBoardMetaLoading] = useState(false);
 
   const columnDragIdRef = useRef(null);
+  const autosaveRef = useRef(null);
 
   const [taskGraph, setTaskGraph] = useState(null);
   const [taskGraphLoading, setTaskGraphLoading] = useState(false);
@@ -1380,6 +1384,33 @@ function App() {
       setAuthMsg(e.message);
     }
   }, [user, activeBoardId, columns, fetchTasks]);
+
+  // Autosave task edits with a 1.5 s debounce (edit mode only — new tasks have no id yet)
+  useEffect(() => {
+    if (!taskEditor || taskEditor.mode !== "edit") {
+      setAutosaveStatus(null);
+      return;
+    }
+    clearTimeout(autosaveRef.current);
+    autosaveRef.current = setTimeout(async () => {
+      setAutosaveStatus("saving");
+      try {
+        await updateTask(taskEditor.task.id, taskEditor.task);
+        setAutosaveStatus("saved");
+        setTimeout(() => setAutosaveStatus((s) => (s === "saved" ? null : s)), 2000);
+      } catch {
+        setAutosaveStatus(null);
+      }
+    }, 1500);
+    return () => clearTimeout(autosaveRef.current);
+  }, [taskEditor?.task]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Keep taskDetail in sync when the tasks list refreshes (e.g. after autosave)
+  useEffect(() => {
+    if (!taskDetail) return;
+    const fresh = tasks.find((t) => t.id === taskDetail.id);
+    if (fresh) setTaskDetail(fresh);
+  }, [tasks]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const deleteTask = useCallback(async (id) => {
     if (!user) return;
@@ -1996,6 +2027,7 @@ function App() {
       const first = orderedColumns[0];
       setTaskEditor({
         mode: "new",
+        _key: uid("editor"),
         task: {
           title: "",
           description: "",
@@ -2104,6 +2136,8 @@ function App() {
 
     const saveEditor = async () => {
       if (!taskEditor) return;
+      clearTimeout(autosaveRef.current);
+      setAutosaveStatus(null);
       if (taskEditor.mode === "new") {
         await createTask(taskEditor.task);
       } else {
@@ -2390,15 +2424,15 @@ function App() {
                   <div style=${{ display: "grid", gap: "10px" }}>
                     ${colTasks.map((t) => {
                       return html`
-                        <div className="taskCard" onClick=${() => openTaskGraph(t)}>
+                        <div className="taskCard" onClick=${() => setTaskDetail(t)}>
                           <div className="row">
                             <div className="taskTitle">${truncate(t.title, 80)}</div>
                             <div className="spacer"></div>
                             ${t.due_date ? html`<span className="pill">Due ${formatDateDMY(t.due_date)}</span>` : html``}
                           </div>
-                          ${t.description ? html`<div className="taskDesc">${truncate(stripHtml(t.description), 160)}</div>` : html`<div className="taskDesc">(no description)</div>`}
+                          ${t.description ? html`<div className="taskDesc">${truncate(stripHtml(t.description), 160)}</div>` : html`<div className="taskDesc muted">(no description)</div>`}
                           <div className="row" style=${{ marginTop: "4px" }}>
-                            <span className="pill">Open graph</span>
+                            <span className="pill taskCardHint">View</span>
                             <div className="spacer"></div>
                             <button className="btn" style=${{ padding: "6px 8px" }} onClick=${(e) => { e.stopPropagation(); openEdit(t); }}>Edit</button>
                           </div>
@@ -2660,7 +2694,9 @@ function App() {
                   <div className="panelHeader">
                     <div>
                       <div className="name">${taskEditor.mode === "new" ? "New Task" : "Edit Task"}</div>
-                      <div className="meta">${taskEditor.mode === "new" ? "Create a card" : `ID: ${taskEditor.task.id}`}</div>
+                      <div className=${"meta" + (autosaveStatus === "saved" ? " autosaveSaved" : "")}>
+                        ${autosaveStatus === "saving" ? "Saving…" : autosaveStatus === "saved" ? "Saved" : taskEditor.mode === "new" ? "Create a card" : `ID: ${taskEditor.task.id}`}
+                      </div>
                     </div>
                     <button className="btn" onClick=${() => setTaskEditor(null)}>Close</button>
                   </div>
@@ -2673,7 +2709,7 @@ function App() {
                   <div className="field">
                     <div className="label">Description</div>
                     <${RichEditor}
-                      key=${taskEditor.task.id ?? "new"}
+                      key=${taskEditor.task.id ?? taskEditor._key}
                       defaultContent=${taskEditor.task.description ?? ""}
                       onChange=${(v) => setTaskEditor((p) => ({ ...p, task: { ...p.task, description: v } }))}
                     />
@@ -2732,6 +2768,35 @@ function App() {
               </div>
             `
           : html``}
+
+        ${taskDetail
+          ? html`
+              <div className="modalOverlay" onClick=${() => setTaskDetail(null)}>
+                <div className="modal taskDetailModal" onClick=${(e) => e.stopPropagation()}>
+                  <div className="panelHeader">
+                    <div className="name" style=${{ fontSize: "16px" }}>${taskDetail.title}</div>
+                    <button className="btn" onClick=${() => setTaskDetail(null)}>Close</button>
+                  </div>
+
+                  ${taskDetail.due_date ? html`
+                    <div style=${{ marginTop: "8px" }}>
+                      <span className="pill">Due ${formatDateDMY(taskDetail.due_date)}</span>
+                    </div>
+                  ` : null}
+
+                  <div className="taskDetailBody">
+                    <${RichViewer} content=${taskDetail.description} />
+                  </div>
+
+                  <div className="row" style=${{ marginTop: "16px" }}>
+                    <button className="btn" onClick=${() => { setTaskDetail(null); openEdit(taskDetail); }}>Edit</button>
+                    <div className="spacer"></div>
+                    <button className="btn primary" onClick=${() => { setTaskDetail(null); openTaskGraph(taskDetail); }}>Open Graph</button>
+                  </div>
+                </div>
+              </div>
+            `
+          : null}
 
         ${stageEditor
           ? html`

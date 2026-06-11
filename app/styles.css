@@ -123,7 +123,7 @@ body, .brand, .toolbar, .panel, .rf-node {
 .app {
   height: 100%;
   display: grid;
-  grid-template-columns: 1fr 360px;
+  grid-template-columns: 1fr 420px;
 }
 
 .canvas {
@@ -1483,4 +1483,39 @@ html[data-theme="light"] .richContent mark {
 html[data-theme="light"] .richContent img,
 html[data-theme="light"] .richContent iframe {
   border-color: rgba(15, 23, 42, 0.12);
+}
+
+/* RichViewer — read-only rendering of stored HTML */
+.richContent.richViewer {
+  min-height: 0;
+  max-height: 60vh;
+  overflow-y: auto;
+  padding: 0;
+  background: transparent;
+}
+
+/* Task detail modal */
+.taskDetailModal {
+  max-width: 680px;
+  width: min(680px, 92vw);
+  display: flex;
+  flex-direction: column;
+  max-height: 82vh;
+}
+
+.taskDetailBody {
+  flex: 1;
+  overflow-y: auto;
+  margin-top: 14px;
+  padding-right: 2px;
+}
+
+/* Autosave "Saved" indicator in modal header */
+.autosaveSaved {
+  color: var(--ok);
+}
+
+/* "View" pill on task cards — subtler than action pills */
+.taskCardHint {
+  opacity: 0.6;
 }
