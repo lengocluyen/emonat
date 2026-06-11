@@ -551,16 +551,16 @@ app.get('/api/tasks/:id/graph', authMiddleware, async (req, res) => {
 
   const { rows } = await pool.query('select graph from public.task_graphs where task_id=$1', [id]);
   if (!rows[0]) {
-    // Default graph: one task node representing this card
+    // Default graph: one root node representing this task card
     const graph = {
       layoutMode: 'brain',
       edgeKind: 'reference',
       nodes: [
         {
-          id: 'root_task',
-          type: 'task',
+          id: `root_${id}`,
+          type: 'rootTask',
           position: { x: 240, y: 180 },
-          data: { title: task.title, status: 'pending', content: '' },
+          data: { title: task.title, tags: [] },
         },
       ],
       edges: [],

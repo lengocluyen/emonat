@@ -21,6 +21,8 @@
   dagre,
 } from "./vendor.js";
 
+import { RichEditor } from "./RichEditor.js";
+
 const html = htm.bind(React.createElement);
 
 const STORAGE_KEY = "emonat.graph.v1";
@@ -248,6 +250,13 @@ function truncate(s, n) {
   const v = String(s ?? "").trim();
   if (v.length <= n) return v;
   return v.slice(0, n - 1) + "…";
+}
+
+function stripHtml(html) {
+  if (!html) return "";
+  const d = document.createElement("div");
+  d.innerHTML = html;
+  return (d.textContent || d.innerText || "").replace(/\s+/g, " ").trim();
 }
 
 function normalizeTags(value) {
@@ -861,7 +870,6 @@ function App() {
   const ensureTaskGraphRoot = useCallback(
     (graph, rootTitle, taskIdOverride) => {
       if (!graph) return graph;
-      const taskIdForRoot = taskIdOverride ?? (taskGraphRootId ? String(taskGraphRootId).replace(/^root_/, "") : null);
       const rootId = taskIdOverride ? `root_${taskIdOverride}` : taskGraphRootId;
       if (!rootId) return graph;
       let nodes = Array.isArray(graph.nodes) ? graph.nodes : [];
@@ -871,7 +879,7 @@ function App() {
       // Normalize to the canonical root id: "root_<taskId>".
       if (taskIdOverride != null) {
         const tid = String(taskIdOverride);
-        const legacyIds = [`root${tid}`, `root-${tid}`, `root:${tid}`];
+        const legacyIds = [`root${tid}`, `root-${tid}`, `root:${tid}`, "root_task"];
         const legacyNode = nodes.find((n) => legacyIds.includes(n?.id));
         const canonicalExists = nodes.some((n) => n?.id === rootId);
 
@@ -897,10 +905,11 @@ function App() {
         // If multiple legacy roots existed, remove them all.
         nodes = nodes.filter((n) => !legacyIds.includes(n?.id));
 
-        // Deduplicate identical edges after id normalization.
+        // Deduplicate identical edges and drop self-loops after id normalization.
         const seen = new Set();
         edges = edges.filter((e) => {
           if (!e) return false;
+          if (e.source === e.target) return false;
           const key = `${e.source}__${e.target}__${e?.data?.kind ?? ""}`;
           if (seen.has(key)) return false;
           seen.add(key);
@@ -1635,7 +1644,11 @@ function App() {
 
         <div className="field">
           <div className="label">Notes</div>
-          <textarea className="textarea" value=${node.data?.content ?? ""} onChange=${(e) => updateNodeData(node.id, { content: e.target.value })}></textarea>
+          <${RichEditor}
+            key=${node.id}
+            defaultContent=${node.data?.content ?? ""}
+            onChange=${(v) => updateNodeData(node.id, { content: v })}
+          />
         </div>
 
         ${type === "memory" && node.data?.fileName
@@ -2383,7 +2396,7 @@ function App() {
                             <div className="spacer"></div>
                             ${t.due_date ? html`<span className="pill">Due ${formatDateDMY(t.due_date)}</span>` : html``}
                           </div>
-                          ${t.description ? html`<div className="taskDesc">${truncate(t.description, 160)}</div>` : html`<div className="taskDesc">(no description)</div>`}
+                          ${t.description ? html`<div className="taskDesc">${truncate(stripHtml(t.description), 160)}</div>` : html`<div className="taskDesc">(no description)</div>`}
                           <div className="row" style=${{ marginTop: "4px" }}>
                             <span className="pill">Open graph</span>
                             <div className="spacer"></div>
@@ -2659,7 +2672,11 @@ function App() {
 
                   <div className="field">
                     <div className="label">Description</div>
-                    <textarea className="textarea" value=${taskEditor.task.description ?? ""} onChange=${(e) => setTaskEditor((p) => ({ ...p, task: { ...p.task, description: e.target.value } }))}></textarea>
+                    <${RichEditor}
+                      key=${taskEditor.task.id ?? "new"}
+                      defaultContent=${taskEditor.task.description ?? ""}
+                      onChange=${(v) => setTaskEditor((p) => ({ ...p, task: { ...p.task, description: v } }))}
+                    />
                   </div>
 
                   <div className="row">
@@ -2889,7 +2906,11 @@ function App() {
 
                     <div className="field">
                       <div className="label">Notes</div>
-                      <textarea className="textarea" value=${node.data?.content ?? ""} onChange=${(e) => patchNode({ content: e.target.value })}></textarea>
+                      <${RichEditor}
+                        key=${node.id}
+                        defaultContent=${node.data?.content ?? ""}
+                        onChange=${(v) => patchNode({ content: v })}
+                      />
                     </div>
 
                     <div className="row">
