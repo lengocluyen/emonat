@@ -2300,21 +2300,24 @@ function App() {
 
             <div className="headerRight desktopOnly">
               <div className="searchBar" role="search">
-                <input
-                  className="input searchInput"
-                  placeholder="Search tasks…"
-                  title=${!user ? "Login to search" : "Search tasks"}
-                  value=${taskSearch}
-                  disabled=${!user}
-                  onChange=${(e) => setTaskSearch(e.target.value)}
-                  onKeyDown=${(e) => {
-                    if (e.key === "Escape") setTaskSearch("");
-                    if (e.key === "Enter") {
-                      if (!user) window.location.hash = "#/login?mode=login";
-                      else window.location.hash = `#/board?q=${encodeURIComponent(taskSearch.trim())}`;
-                    }
-                  }}
-                />
+                <div className="searchInputWrap">
+                  ${SearchIcon()}
+                  <input
+                    className="input searchInput"
+                    placeholder="Search tasks…"
+                    title=${!user ? "Login to search" : "Search tasks"}
+                    value=${taskSearch}
+                    disabled=${!user}
+                    onChange=${(e) => setTaskSearch(e.target.value)}
+                    onKeyDown=${(e) => {
+                      if (e.key === "Escape") setTaskSearch("");
+                      if (e.key === "Enter") {
+                        if (!user) window.location.hash = "#/login?mode=login";
+                        else window.location.hash = `#/board?q=${encodeURIComponent(taskSearch.trim())}`;
+                      }
+                    }}
+                  />
+                </div>
                 ${taskSearch
                   ? html`<button className="btn" onClick=${() => setTaskSearch("")} title="Clear">Clear</button>`
                   : html``}
@@ -2451,22 +2454,25 @@ function App() {
                         </button>
 
                         <div className="searchBar" role="search">
-                          <input
-                            className="input searchInput"
-                            placeholder="Search tasks…"
-                            title=${!user ? "Login to search" : "Search tasks"}
-                            value=${taskSearch}
-                            disabled=${!user}
-                            onChange=${(e) => setTaskSearch(e.target.value)}
-                            onKeyDown=${(e) => {
-                              if (e.key === "Escape") setTaskSearch("");
-                              if (e.key === "Enter") {
-                                setHeaderMenuOpen(false);
-                                if (!user) window.location.hash = "#/login?mode=login";
-                                else window.location.hash = `#/board?q=${encodeURIComponent(taskSearch.trim())}`;
-                              }
-                            }}
-                          />
+                          <div className="searchInputWrap">
+                            ${SearchIcon()}
+                            <input
+                              className="input searchInput"
+                              placeholder="Search tasks…"
+                              title=${!user ? "Login to search" : "Search tasks"}
+                              value=${taskSearch}
+                              disabled=${!user}
+                              onChange=${(e) => setTaskSearch(e.target.value)}
+                              onKeyDown=${(e) => {
+                                if (e.key === "Escape") setTaskSearch("");
+                                if (e.key === "Enter") {
+                                  setHeaderMenuOpen(false);
+                                  if (!user) window.location.hash = "#/login?mode=login";
+                                  else window.location.hash = `#/board?q=${encodeURIComponent(taskSearch.trim())}`;
+                                }
+                              }}
+                            />
+                          </div>
                           ${taskSearch
                             ? html`<button className="btn" onClick=${() => setTaskSearch("")} title="Clear">Clear</button>`
                             : html``}
@@ -2825,16 +2831,18 @@ function App() {
 
             <div className="headerRight desktopOnly">
               <div className="searchBar" role="search">
-                ${SearchIcon()}
-                <input
-                  className="input searchInput"
-                  placeholder="Search tasks…"
-                  value=${taskSearch}
-                  onChange=${(e) => setTaskSearch(e.target.value)}
-                  onKeyDown=${(e) => {
-                    if (e.key === "Escape") setTaskSearch("");
-                  }}
-                />
+                <div className="searchInputWrap">
+                  ${SearchIcon()}
+                  <input
+                    className="input searchInput"
+                    placeholder="Search tasks…"
+                    value=${taskSearch}
+                    onChange=${(e) => setTaskSearch(e.target.value)}
+                    onKeyDown=${(e) => {
+                      if (e.key === "Escape") setTaskSearch("");
+                    }}
+                  />
+                </div>
                 ${taskSearch
                   ? html`<button className="btn iconBtn" onClick=${() => setTaskSearch("")} title="Clear search"><${XIcon} /></button>`
                   : html``}
@@ -3002,16 +3010,19 @@ function App() {
                       </button>
 
                       <div className="searchBar" role="search">
-                        <input
-                          className="input searchInput"
-                          placeholder="Search tasks…"
-                          value=${taskSearch}
-                          onChange=${(e) => setTaskSearch(e.target.value)}
-                          onKeyDown=${(e) => {
-                            if (e.key === "Escape") setTaskSearch("");
-                            if (e.key === "Enter") setHeaderMenuOpen(false);
-                          }}
-                        />
+                        <div className="searchInputWrap">
+                          ${SearchIcon()}
+                          <input
+                            className="input searchInput"
+                            placeholder="Search tasks…"
+                            value=${taskSearch}
+                            onChange=${(e) => setTaskSearch(e.target.value)}
+                            onKeyDown=${(e) => {
+                              if (e.key === "Escape") setTaskSearch("");
+                              if (e.key === "Enter") setHeaderMenuOpen(false);
+                            }}
+                          />
+                        </div>
                         ${taskSearch
                           ? html`<button className="btn" onClick=${() => setTaskSearch("")} title="Clear">Clear</button>`
                           : html``}
@@ -3955,21 +3966,24 @@ function App() {
 
             <div className="headerRight desktopOnly">
               <div className="searchBar" role="search">
-                <input
-                  className="input searchInput"
-                  placeholder="Search tasks…"
-                  title=${!user ? "Login to search" : "Search tasks"}
-                  value=${taskSearch}
-                  disabled=${!user}
-                  onChange=${(e) => setTaskSearch(e.target.value)}
-                  onKeyDown=${(e) => {
-                    if (e.key === "Escape") setTaskSearch("");
-                    if (e.key === "Enter") {
-                      if (!user) window.location.hash = "#/login?mode=login";
-                      else window.location.hash = `#/board?q=${encodeURIComponent(taskSearch.trim())}`;
-                    }
-                  }}
-                />
+                <div className="searchInputWrap">
+                  ${SearchIcon()}
+                  <input
+                    className="input searchInput"
+                    placeholder="Search tasks…"
+                    title=${!user ? "Login to search" : "Search tasks"}
+                    value=${taskSearch}
+                    disabled=${!user}
+                    onChange=${(e) => setTaskSearch(e.target.value)}
+                    onKeyDown=${(e) => {
+                      if (e.key === "Escape") setTaskSearch("");
+                      if (e.key === "Enter") {
+                        if (!user) window.location.hash = "#/login?mode=login";
+                        else window.location.hash = `#/board?q=${encodeURIComponent(taskSearch.trim())}`;
+                      }
+                    }}
+                  />
+                </div>
                 ${taskSearch
                   ? html`<button className="btn" onClick=${() => setTaskSearch("")} title="Clear">Clear</button>`
                   : html``}
@@ -4030,22 +4044,25 @@ function App() {
                       </button>
 
                       <div className="searchBar" role="search">
-                        <input
-                          className="input searchInput"
-                          placeholder="Search tasks…"
-                          title=${!user ? "Login to search" : "Search tasks"}
-                          value=${taskSearch}
-                          disabled=${!user}
-                          onChange=${(e) => setTaskSearch(e.target.value)}
-                          onKeyDown=${(e) => {
-                            if (e.key === "Escape") setTaskSearch("");
-                            if (e.key === "Enter") {
-                              setHeaderMenuOpen(false);
-                              if (!user) window.location.hash = "#/login?mode=login";
-                              else window.location.hash = `#/board?q=${encodeURIComponent(taskSearch.trim())}`;
-                            }
-                          }}
-                        />
+                        <div className="searchInputWrap">
+                          ${SearchIcon()}
+                          <input
+                            className="input searchInput"
+                            placeholder="Search tasks…"
+                            title=${!user ? "Login to search" : "Search tasks"}
+                            value=${taskSearch}
+                            disabled=${!user}
+                            onChange=${(e) => setTaskSearch(e.target.value)}
+                            onKeyDown=${(e) => {
+                              if (e.key === "Escape") setTaskSearch("");
+                              if (e.key === "Enter") {
+                                setHeaderMenuOpen(false);
+                                if (!user) window.location.hash = "#/login?mode=login";
+                                else window.location.hash = `#/board?q=${encodeURIComponent(taskSearch.trim())}`;
+                              }
+                            }}
+                          />
+                        </div>
                         ${taskSearch
                           ? html`<button className="btn" onClick=${() => setTaskSearch("")} title="Clear">Clear</button>`
                           : html``}

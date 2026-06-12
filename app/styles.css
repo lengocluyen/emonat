@@ -497,10 +497,23 @@ html[data-theme="light"] .menuDivider {
   max-width: 520px;
 }
 
-.searchBar > .icon { flex-shrink: 0; opacity: 0.55; }
+.searchInputWrap {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+.searchInputWrap > .icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 0.45;
+  pointer-events: none;
+}
 
 .searchInput {
   width: 100%;
+  padding-left: 32px;
 }
 
 .searchInput:disabled {
