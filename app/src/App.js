@@ -3096,7 +3096,10 @@ function App() {
                       e.preventDefault();
                       e.dataTransfer.dropEffect = "move";
                       const rect = e.currentTarget.getBoundingClientRect();
-                      const insertIdx = e.clientX > rect.left + rect.width / 2 ? idx + 1 : idx;
+                      // Sidebar: columns stacked vertically → use Y; full-board: horizontal → use X
+                      const insertIdx = selectedTaskId
+                        ? (e.clientY > rect.top + rect.height / 2 ? idx + 1 : idx)
+                        : (e.clientX > rect.left + rect.width / 2 ? idx + 1 : idx);
                       colDropRef.current = { index: insertIdx };
                       setColDropVisual(insertIdx);
                     }
@@ -3170,7 +3173,7 @@ function App() {
                 >
                   <div
                     className="colHeader colHeaderDraggable"
-                    draggable=${!isMobile && !selectedTaskId && activeBoardId && String(col.id).length > 10 ? "true" : "false"}
+                    draggable=${!isMobile && activeBoardId && String(col.id).length > 10 ? "true" : "false"}
                     onTouchStart=${isMobile && activeBoardId && !selectedTaskId && String(col.id).length > 10 ? (e) => {
                       const origEl = e.currentTarget.closest('.col') || e.currentTarget;
                       const cid = col.id;

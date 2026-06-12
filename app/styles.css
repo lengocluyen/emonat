@@ -956,6 +956,16 @@ html[data-theme="light"] .col.colDragOver {
   to   { opacity: 1;   box-shadow: 0 0 28px var(--accent), 0 0 48px rgba(41,182,246,0.35); }
 }
 
+/* Sidebar mode: groups stacked vertically — drop indicator on top/bottom */
+.kanban.kanbanSidebar .col.colDropBefore::before {
+  left: 0; right: 0; top: -6px; bottom: auto;
+  width: auto; height: 3px;
+}
+.kanban.kanbanSidebar .col.colDropAfter::after {
+  left: 0; right: 0; top: auto; bottom: -6px;
+  width: auto; height: 3px;
+}
+
 .colAddBtn {
   width: 100%;
   margin-top: 4px;
