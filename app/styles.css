@@ -1,3 +1,26 @@
+/* ── Top loading bar (fixed, never shifts layout) ─────────────────── */
+.loadingBar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  z-index: 9999;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    var(--accent) 40%,
+    #81d4fa 60%,
+    transparent 100%);
+  background-size: 300% 100%;
+  animation: loadingBarSweep 1.4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes loadingBarSweep {
+  0%   { background-position: 100% 0; }
+  100% { background-position: -100% 0; }
+}
+
 :root {
   --bg: #0b0f17;
   --panel: rgba(15, 20, 31, 0.9);
@@ -97,7 +120,7 @@ html[data-theme="light"] .memoryNode img {
 }
 
 * { box-sizing: border-box; }
-html, body { height: 100%; }
+html { min-height: 100%; }
 body {
   margin: 0;
   font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
@@ -105,20 +128,23 @@ body {
   background: radial-gradient(1200px 800px at 20% 0%, rgba(41, 182, 246, 0.10), transparent 55%),
               radial-gradient(900px 700px at 90% 20%, rgba(34, 197, 94, 0.08), transparent 55%),
               var(--bg);
-  overflow: hidden;
+  background-attachment: fixed;
+  overflow-x: hidden;
+  min-height: 100vh;
 }
 
 html[data-theme="light"] body {
   background: radial-gradient(1200px 800px at 20% 0%, rgba(37, 99, 235, 0.10), transparent 55%),
               radial-gradient(900px 700px at 90% 20%, rgba(22, 163, 74, 0.08), transparent 55%),
               var(--bg);
+  background-attachment: fixed;
 }
 
 body, .brand, .toolbar, .panel, .rf-node {
   transition: background-color 140ms ease-in-out, border-color 140ms ease-in-out, color 140ms ease-in-out, box-shadow 140ms ease-in-out, filter 140ms ease-in-out;
 }
 
-#root { height: 100%; }
+#root { min-height: 100vh; }
 
 .app {
   height: 100%;
@@ -146,17 +172,18 @@ body, .brand, .toolbar, .panel, .rf-node {
 /* For full-screen pages (Home/Login/Board): keep header in flow and responsive */
 .screen > .topbar {
   position: sticky;
-  top: 0;
+  top: 16px;
   left: auto;
   right: auto;
   margin: 16px;
   flex-wrap: wrap;
+  z-index: 100;
 }
 
 .headerBlock {
   pointer-events: auto;
   width: 100%;
-  padding: 8px;
+  padding: 0 4px 0 0;
   background: var(--panel);
   border: 1px solid var(--panelBorder);
   border-radius: var(--radius);
@@ -187,15 +214,25 @@ body, .brand, .toolbar, .panel, .rf-node {
 }
 
 .headerBlock .brand {
-  padding: 8px 10px;
-  box-shadow: none;
-  border: 1px solid transparent;
+  padding: 4px 6px;
   background: transparent;
+  border: none;
+  box-shadow: none;
+  backdrop-filter: none;
 }
 
 .headerBlock .brandLogo {
-  width: 24px;
-  height: 24px;
+  width: 80px;
+  height: 45px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  border-color: rgba(41, 182, 246, 0.25);
+  box-shadow: 0 0 8px rgba(41, 182, 246, 0.2);
+}
+
+html[data-theme="light"] .headerBlock .brandLogo {
+  border-color: rgba(37, 99, 235, 0.2);
+  box-shadow: none;
 }
 
 /* Only the mobile actions container should auto-push to the right.
@@ -204,13 +241,32 @@ body, .brand, .toolbar, .panel, .rf-node {
 .headerBlock > .menuWrap {
   margin-left: auto;
 }
+
+/* Uniform height for all interactive controls in the header */
+.headerBlock .btn,
+.headerBlock .select,
+.headerBlock .searchInput,
+.headerBlock .avatarBtn {
+  height: 36px;
+  box-sizing: border-box;
+}
+
+/* Icon-only buttons and avatar — same square size */
+.headerBlock .iconBtn,
+.headerBlock .avatarBtn {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  justify-content: center;
+  flex-shrink: 0;
+}
 .headerRight .menuWrap {
   margin-left: 0;
 }
 
 .brand {
   pointer-events: auto;
-  padding: 10px 12px;
+  padding: 10px 14px;
   background: var(--panel);
   border: 1px solid var(--panelBorder);
   border-radius: var(--radius);
@@ -218,7 +274,7 @@ body, .brand, .toolbar, .panel, .rf-node {
   backdrop-filter: blur(10px);
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
 .brandLink {
@@ -232,21 +288,34 @@ body, .brand, .toolbar, .panel, .rf-node {
 }
 
 .brandLogo {
-  width: 26px;
-  height: 26px;
+  width: 80px;
+  height: 45px;
+  flex-shrink: 0;
   border-radius: 8px;
   object-fit: cover;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+  border: 1.5px solid rgba(41, 182, 246, 0.45);
+  box-shadow: 0 0 12px rgba(41, 182, 246, 0.35), 0 6px 18px rgba(0, 0, 0, 0.3);
+}
+
+html[data-theme="light"] .brandLogo {
+  border-color: rgba(37, 99, 235, 0.4);
+  box-shadow: 0 0 10px rgba(37, 99, 235, 0.2), 0 4px 12px rgba(15, 23, 42, 0.15);
 }
 
 .brand .title {
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
   line-height: 1;
   display: flex;
   align-items: center;
+  color: var(--accent);
 }
 
-.brand .title { font-weight: 700; letter-spacing: 0.2px; }
+html[data-theme="light"] .brand .title {
+  color: #2563eb;
+}
+
 .brand .subtitle { color: var(--muted); font-size: 12px; }
 
 .toolbar {
@@ -269,9 +338,9 @@ body, .brand, .toolbar, .panel, .rf-node {
 }
 
 .iconBtn {
-  padding: 8px 10px;
-  width: 38px;
-  height: 34px;
+  padding: 7px;
+  width: auto;
+  height: auto;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -320,12 +389,14 @@ body, .brand, .toolbar, .panel, .rf-node {
 }
 
 .menuIcon {
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 }
+.menuIcon .icon { width: 20px; height: 20px; }
 
 .menuDivider {
   height: 1px;
@@ -349,14 +420,41 @@ body, .brand, .toolbar, .panel, .rf-node {
 }
 
 .avatarBtn {
-  padding: 6px;
-  width: 38px;
-  height: 34px;
+  padding: 5px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  /* No box — just the icon/image, no extra border from .btn */
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+}
+.avatarBtn:hover { background: rgba(255,255,255,0.07); border-color: transparent; }
+
+/* Small avatar image in header button */
+.avatarImgSm {
+  width: 28px;
+  height: 28px;
+  aspect-ratio: 1/1;
+  border-radius: 8px;
+  object-fit: cover;
+  border: 1.5px solid rgba(41,182,246,0.4);
+  display: block;
 }
 
+/* Large avatar image in user menu dropdown */
+.avatarImgLg {
+  width: 44px;
+  height: 44px;
+  aspect-ratio: 1/1;
+  border-radius: 10px;
+  object-fit: cover;
+  border: 2px solid rgba(41,182,246,0.4);
+  flex-shrink: 0;
+  display: block;
+}
+
+/* Fallback circle with initial (kept for menu dropdown only) */
 .avatarCircle {
   width: 26px;
   height: 26px;
@@ -393,19 +491,16 @@ html[data-theme="light"] .menuDivider {
   pointer-events: auto;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   flex: 1;
   min-width: 220px;
   max-width: 520px;
 }
 
+.searchBar > .icon { flex-shrink: 0; opacity: 0.55; }
+
 .searchInput {
   width: 100%;
-  padding-left: 34px;
-  background-image: var(--searchIconUrl);
-  background-repeat: no-repeat;
-  background-position: 10px 50%;
-  background-size: 16px 16px;
 }
 
 .searchInput:disabled {
@@ -419,14 +514,23 @@ html[data-theme="light"] .menuDivider {
   background: rgba(255, 255, 255, 0.06);
   color: var(--text);
   border-radius: 10px;
-  padding: 8px 10px;
+  padding: 8px 12px;
   font-size: 13px;
   cursor: pointer;
+  /* Flex so icons and text always stay vertically centred */
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  line-height: 1;
 }
 
 .btn:hover { border-color: rgba(255, 255, 255, 0.18); background: rgba(255, 255, 255, 0.09); }
 .btn.primary { border-color: rgba(41, 182, 246, 0.55); background: rgba(41, 182, 246, 0.16); }
 .btn.danger { border-color: rgba(255, 107, 107, 0.55); background: rgba(255, 107, 107, 0.14); }
+
+/* Icon inside a btn — already centred by parent flexbox, no hacks needed */
+.btn .icon { flex-shrink: 0; }
 
 .select {
   border: 1px solid rgba(255, 255, 255, 0.12);
@@ -476,8 +580,23 @@ html[data-theme="light"] .select option {
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.panelHeader .name { font-weight: 700; }
+.panelHeader .name { font-weight: 700; display: flex; align-items: center; gap: 7px; }
+.panelHeader .name .icon { opacity: 0.75; flex-shrink: 0; }
 .panelHeader .meta { color: var(--muted); font-size: 12px; }
+.panelMeta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 12px;
+}
+.panelMeta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.panelMeta .icon { width: 12px; height: 12px; opacity: 0.7; flex-shrink: 0; }
 
 .field { margin-top: 12px; display: grid; gap: 6px; }
 .label { color: var(--muted); font-size: 12px; }
@@ -571,14 +690,14 @@ html[data-theme="light"] .btn.active {
 }
 
 .screen {
-  height: 100%;
-  display: grid;
-  grid-template-rows: auto 1fr;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
 .screenBody {
   padding: 18px;
-  overflow: auto;
+  flex: 1;
 }
 
 /* Home: allow full-bleed layout (no outer padding/margins) */
@@ -611,19 +730,81 @@ html[data-theme="light"] .btn.active {
 .spacer { flex: 1; }
 
 .kanban {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(240px, 1fr));
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: flex-start;
   gap: 12px;
 }
 
-/* When a task graph is open on desktop, the board becomes a split view.
-   In this mode, collapse the Kanban into a single-column sidebar. */
+/* ── Resize handle between kanban and graph ──────────────────────── */
+.resizeHandle {
+  flex-shrink: 0;
+  width: 14px;
+  align-self: stretch;
+  min-height: 100px;
+  cursor: col-resize;
+  position: relative;
+  margin: 0 2px;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+/* Thin visible line — very subtle by default */
+.resizeHandle::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 1px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 2px;
+  transition: width 0.2s, background 0.2s, box-shadow 0.2s;
+}
+/* Grip dots in the centre */
+.resizeHandle::after {
+  content: "⋮";
+  font-size: 14px;
+  line-height: 1;
+  color: rgba(255, 255, 255, 0.15);
+  pointer-events: none;
+  transition: color 0.2s;
+  user-select: none;
+}
+.resizeHandle:hover::before,
+.resizeHandle:active::before {
+  width: 2px;
+  background: var(--accent);
+  box-shadow: 0 0 8px var(--accent);
+}
+.resizeHandle:hover::after,
+.resizeHandle:active::after {
+  color: var(--accent);
+}
+
+/* Target 5 columns per row; 6th wraps to the next row automatically */
+.kanban > .col {
+  flex: 1 1 calc(20% - 10px);
+  min-width: 220px;
+}
+
+/* When the task graph is open alongside the board, stack columns vertically
+   so they all fit in the fixed-width left panel (360px). */
 .kanban.kanbanSidebar {
-  grid-template-columns: 1fr;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  width: 100%;
+  min-width: 0;
   gap: 10px;
 }
 
-.kanban.kanbanSidebar .col {
+.kanban.kanbanSidebar > .col {
+  flex: none;
+  width: 100%;
+  min-width: 0;
   min-height: auto;
   padding: 10px;
 }
@@ -672,7 +853,122 @@ html[data-theme="light"] .colHeader {
   border-bottom-color: rgba(15, 23, 42, 0.10);
 }
 
-.colTitle { font-weight: 700; }
+.colTitle { font-weight: 700; display: flex; align-items: center; gap: 6px; }
+.colTitle .icon { opacity: 0.55; flex-shrink: 0; }
+
+/* Uniform height for all controls in the column header action row */
+.colHeader .row .btn,
+.colHeader .row .pill {
+  height: 26px;
+  min-width: 26px;
+  padding: 0 6px;
+  font-size: 12px;
+  box-sizing: border-box;
+}
+
+.colTitleEditable {
+  cursor: text;
+  border-radius: 6px;
+  padding: 2px 4px;
+  margin: -2px -4px;
+  transition: background 0.15s;
+}
+.colTitleEditable:hover { background: rgba(255, 255, 255, 0.08); }
+html[data-theme="light"] .colTitleEditable:hover { background: rgba(15, 23, 42, 0.07); }
+
+.colTitleEdit {
+  font-weight: 700;
+  font-size: inherit;
+  padding: 2px 6px;
+  border-radius: 6px;
+  min-width: 0;
+  width: 140px;
+}
+
+.colDeleteBtn {
+  opacity: 0.4;
+  font-size: 11px;
+  transition: opacity 0.15s;
+}
+.colDeleteBtn:hover { opacity: 1; color: var(--danger); }
+
+.col {
+  transition: opacity 0.2s, transform 0.2s, box-shadow 0.2s;
+}
+
+/* Column being dragged — lifted */
+.col.colDragging {
+  opacity: 0.3;
+  box-shadow: none !important;
+}
+
+/* Column that a TASK is being dragged over */
+.col.colDragOver {
+  border-color: var(--accent);
+  background: rgba(41, 182, 246, 0.10);
+  box-shadow: 0 0 0 2px var(--accent), inset 0 0 24px rgba(41, 182, 246, 0.08);
+}
+html[data-theme="light"] .col.colDragOver {
+  background: rgba(37, 99, 235, 0.07);
+  box-shadow: 0 0 0 2px #2563eb, inset 0 0 20px rgba(37, 99, 235, 0.06);
+}
+
+/* Vertical drop indicator between columns */
+/* Column drop indicator — pseudo-element so it never shifts layout */
+.col.colDropBefore {
+  position: relative;
+}
+.col.colDropBefore::before {
+  content: "";
+  position: absolute;
+  left: -8px;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  border-radius: 4px;
+  background: var(--accent);
+  box-shadow: 0 0 16px var(--accent), 0 0 32px rgba(41, 182, 246, 0.4);
+  animation: colDropPulse 0.5s ease-in-out infinite alternate;
+  pointer-events: none;
+  z-index: 5;
+}
+/* Drop after last column */
+.col.colDropAfter {
+  position: relative;
+}
+.col.colDropAfter::after {
+  content: "";
+  position: absolute;
+  right: -8px;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  border-radius: 4px;
+  background: var(--accent);
+  box-shadow: 0 0 16px var(--accent), 0 0 32px rgba(41, 182, 246, 0.4);
+  animation: colDropPulse 0.5s ease-in-out infinite alternate;
+  pointer-events: none;
+  z-index: 5;
+}
+
+@keyframes colDropPulse {
+  from { opacity: 0.6; box-shadow: 0 0 10px var(--accent); }
+  to   { opacity: 1;   box-shadow: 0 0 28px var(--accent), 0 0 48px rgba(41,182,246,0.35); }
+}
+
+.colAddBtn {
+  width: 100%;
+  margin-top: 4px;
+  padding: 8px;
+  text-align: center;
+  opacity: 0.55;
+  font-size: 13px;
+  border-style: dashed;
+  border-radius: 10px;
+  transition: opacity 0.15s, background 0.15s;
+}
+.colAddBtn:hover { opacity: 1; background: rgba(41, 182, 246, 0.07); }
+html[data-theme="light"] .colAddBtn:hover { background: rgba(37, 99, 235, 0.06); }
 
 .taskCard {
   background: rgba(15, 20, 31, 0.88);
@@ -689,7 +985,49 @@ html[data-theme="light"] .taskCard {
   border-color: rgba(15, 23, 42, 0.14);
 }
 
-.taskTitle { font-weight: 700; font-size: 13px; }
+.taskCard { cursor: pointer; }
+.taskCard[draggable="true"] { cursor: grab; }
+.taskCard[draggable="true"]:active { cursor: grabbing; }
+.kanban.kanbanSidebar .taskCard { cursor: grab; }
+.kanban.kanbanSidebar .taskCard:active { cursor: grabbing; }
+
+.taskDragHandle {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%);
+  font-size: 16px;
+  color: var(--muted);
+  opacity: 0;
+  cursor: grab;
+  line-height: 1;
+  pointer-events: none;
+  transition: opacity 0.15s;
+}
+.taskCard { position: relative; user-select: none; }
+.taskCard:hover .taskDragHandle { opacity: 0.5; }
+
+.taskCard.dragging {
+  opacity: 0.3;
+  box-shadow: none !important;
+}
+
+.dropLine {
+  height: 3px;
+  border-radius: 3px;
+  background: var(--accent);
+  box-shadow: 0 0 8px var(--accent);
+  margin: -2px 4px;
+  animation: dropLinePulse 0.6s ease-in-out infinite alternate;
+}
+
+@keyframes dropLinePulse {
+  from { opacity: 0.7; }
+  to   { opacity: 1; box-shadow: 0 0 14px var(--accent); }
+}
+
+.taskTitle { font-weight: 700; font-size: 13px; display: flex; align-items: center; gap: 6px; }
+.taskTitle .icon { opacity: 0.55; flex-shrink: 0; }
 .taskDesc {
   color: var(--muted);
   font-size: 12px;
@@ -702,6 +1040,9 @@ html[data-theme="light"] .taskCard {
 }
 
 .pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   font-size: 11px;
   padding: 3px 8px;
   border-radius: 999px;
@@ -763,7 +1104,8 @@ html[data-theme="light"] .pill {
 }
 
 @media (max-width: 900px) {
-  .kanban { grid-template-columns: 1fr; }
+  .kanban { flex-direction: column; }
+  .kanban > .col { min-width: 0; flex: none; width: 100%; }
   .col { min-height: 220px; }
 }
 
@@ -1515,7 +1857,542 @@ html[data-theme="light"] .richContent iframe {
   color: var(--ok);
 }
 
-/* "View" pill on task cards — subtler than action pills */
+/* Hint pill — hidden until hover so it doesn't add noise on every card */
 .taskCardHint {
-  opacity: 0.6;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.taskCard:hover .taskCardHint { opacity: 0.6; }
+
+/* ── User menu improvements ─────────────────────────────────────── */
+.userMenuHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px 10px;
+}
+.avatarCircleLg {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), #7c3aed);
+  color: #fff;
+  font-weight: 700;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.userMenuInfo { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.userMenuName { font-weight: 700; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.userMenuEmail { font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.roleBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  background: linear-gradient(135deg, rgba(41,182,246,0.2), rgba(124,58,237,0.2));
+  color: var(--accent);
+  border: 1px solid rgba(41,182,246,0.3);
+  width: fit-content;
+  margin-top: 2px;
+}
+.roleBadgeLg { font-size: 12px; padding: 3px 10px; margin-top: 4px; }
+.roleBadgeUser {
+  background: rgba(255,255,255,0.06);
+  color: var(--muted);
+  border-color: rgba(255,255,255,0.1);
+}
+html[data-theme="light"] .roleBadge {
+  background: rgba(37,99,235,0.08);
+  border-color: rgba(37,99,235,0.25);
+}
+html[data-theme="light"] .roleBadgeUser {
+  background: rgba(15,23,42,0.05);
+  border-color: rgba(15,23,42,0.12);
+}
+
+/* ── Profile page ────────────────────────────────────────────────── */
+.profilePage {
+  max-width: 760px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.profileIdentity {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.profileAvatarWrap {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  flex-shrink: 0;
+  cursor: pointer;
+  border-radius: 14px;
+  display: block;
+}
+.profileAvatarWrap:hover .profileAvatarOverlay { opacity: 1; }
+
+.profileAvatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 14px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.profileAvatarInitial {
+  background: linear-gradient(135deg, var(--accent), #7c3aed);
+  color: #fff;
+  font-weight: 800;
+  font-size: 30px;
+  box-shadow: 0 0 20px rgba(41,182,246,0.3);
+}
+.profileAvatarImg {
+  object-fit: cover;
+  border: 2px solid rgba(41,182,246,0.4);
+  box-shadow: 0 0 20px rgba(41,182,246,0.3);
+}
+.profileAvatarOverlay {
+  position: absolute;
+  inset: 0;
+  border-radius: 14px;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.18s;
+  color: #fff;
+}
+.profileIdentityInfo { display: flex; flex-direction: column; gap: 4px; }
+.profileDisplayName { font-size: 20px; font-weight: 800; }
+.profileEmail { color: var(--muted); font-size: 13px; }
+.profileSectionTitle {
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--panelBorder);
+}
+.profileSectionTitle.danger { color: var(--danger); border-color: rgba(255,107,107,0.25); }
+.profileMsg { font-size: 13px; }
+.profileMsg.ok { color: var(--ok); }
+.profileMsg.danger { color: var(--danger); }
+
+.dangerZone { border: 1px solid rgba(255,107,107,0.25) !important; }
+.dangerZoneRow {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+html[data-theme="light"] .dangerZone { border-color: rgba(220,38,38,0.2) !important; }
+
+/* ── Admin panel ────────────────────────────────────────────────── */
+.adminPage {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.adminPageHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+.adminStats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+.adminStat {
+  background: var(--panel);
+  border: 1px solid var(--panelBorder);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  text-align: center;
+}
+.adminStatValue { font-size: 28px; font-weight: 800; color: var(--accent); line-height: 1; }
+.adminStatLabel { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+.adminTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.adminTable th {
+  text-align: left;
+  padding: 12px 16px;
+  font-weight: 600;
+  color: var(--muted);
+  font-size: 12px;
+  letter-spacing: 0.4px;
+  border-bottom: 1px solid var(--panelBorder);
+  background: rgba(255,255,255,0.02);
+}
+.adminTable td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--panelBorder);
+  vertical-align: middle;
+}
+.adminTable tr:last-child td { border-bottom: none; }
+.adminTable tr.suspendedRow td { opacity: 0.5; }
+.adminTable tr:hover td { background: rgba(255,255,255,0.02); }
+html[data-theme="light"] .adminTable th { background: rgba(15,23,42,0.02); }
+html[data-theme="light"] .adminTable tr:hover td { background: rgba(15,23,42,0.02); }
+
+.adminUserCell { display: flex; align-items: center; gap: 10px; }
+.adminUserName { font-weight: 600; }
+.adminUserEmail { color: var(--muted); font-size: 12px; }
+.adminMeta { color: var(--muted); font-size: 12px; }
+.adminActions { display: flex; gap: 6px; justify-content: flex-end; flex-wrap: wrap; }
+
+.avatarSm { width: 34px !important; height: 34px !important; font-size: 13px !important; }
+
+.statusBadge {
+  display: inline-flex;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+.statusActive { background: rgba(34,197,94,0.12); color: var(--ok); border: 1px solid rgba(34,197,94,0.25); }
+.statusSuspended { background: rgba(255,107,107,0.12); color: var(--danger); border: 1px solid rgba(255,107,107,0.25); }
+
+@media (max-width: 640px) {
+  .adminStats { grid-template-columns: repeat(2, 1fr); }
+  .adminTable th:nth-child(2), .adminTable td:nth-child(2) { display: none; }
+  .profileIdentity { flex-wrap: wrap; }
+}
+
+/* ── Desktop / tablet UX improvements ─────────────────────────────── */
+
+/* sidebar mode columns fill the panel — no cap */
+.kanban.kanbanSidebar > .col { max-width: none; }
+
+/* #9 — consistent 34px height for all graph toolbar controls */
+.graphToolbar .select,
+.graphToolbar .iconBtn,
+.graphToolbar .btn { height: 34px; box-sizing: border-box; }
+.graphToolbar .iconBtn { width: 34px; padding: 0; }
+
+/* #10 — compact task cards in kanban sidebar mode */
+.kanban.kanbanSidebar .taskDesc { display: none; }
+.kanban.kanbanSidebar .taskCardHint { display: none; }
+
+/* #11 — slightly larger text in task cards */
+.taskTitle { font-size: 14px; }
+.taskDesc  { font-size: 13px; }
+
+/* #5 — highlight the task whose graph is currently open */
+.taskCard.taskSelected {
+  border-color: var(--accent);
+  background: rgba(41, 182, 246, 0.08);
+  box-shadow: 0 0 0 2px rgba(41, 182, 246, 0.25);
+}
+html[data-theme="light"] .taskCard.taskSelected {
+  border-color: #2563eb;
+  background: rgba(37, 99, 235, 0.06);
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.18);
+}
+
+/* #4 — empty column placeholder */
+.colEmpty {
+  color: var(--muted);
+  font-size: 13px;
+  text-align: center;
+  padding: 24px 12px;
+  border: 1px dashed rgba(255, 255, 255, 0.10);
+  border-radius: 12px;
+  pointer-events: none;
+}
+html[data-theme="light"] .colEmpty {
+  border-color: rgba(15, 23, 42, 0.10);
+}
+
+/* Desktop: columns fill the full viewport height so the board feels full-screen */
+@media (min-width: 901px) { .col { min-height: calc(100vh - 160px); } }
+/* Mobile / narrow: columns are content-sized */
+@media (max-width: 900px) { .col { min-height: 160px; } }
+
+/* ── Help / FAQ page ─────────────────────────────────────────────────── */
+.helpWrap {
+  display: grid;
+  gap: 10px;
+  padding-bottom: 40px;
+}
+
+.helpHero { padding: 16px 0 4px; display: grid; gap: 4px; }
+.helpHeroTitle { font-size: 24px; font-weight: 800; display: flex; align-items: center; gap: 10px; }
+.helpHeroTitle .icon { opacity: 0.75; }
+.helpHeroSub { color: var(--muted); font-size: 14px; }
+
+/* Accordion section */
+.helpSection {
+  background: var(--panel);
+  border: 1px solid var(--panelBorder);
+  border-radius: var(--radius);
+  backdrop-filter: blur(10px);
+  overflow: hidden;
+  transition: box-shadow 0.15s;
+}
+.helpSection:focus-within { box-shadow: 0 0 0 2px rgba(41,182,246,0.25); }
+
+.helpSectionHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.15s;
+}
+.helpSectionHeader:hover { background: rgba(255,255,255,0.04); }
+html[data-theme="light"] .helpSectionHeader:hover { background: rgba(15,23,42,0.03); }
+
+.helpSectionIcon { font-size: 20px; flex-shrink: 0; }
+.helpSectionTitle { font-weight: 700; font-size: 15px; flex: 1; }
+.helpChevron { color: var(--muted); transition: transform 0.2s; flex-shrink: 0; }
+.helpChevron.open { transform: rotate(90deg); }
+
+.helpSectionBody {
+  padding: 4px 16px 20px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  align-items: start;
+}
+@media (max-width: 640px) { .helpSectionBody { grid-template-columns: 1fr; } }
+
+.helpTextCol { display: grid; gap: 8px; }
+.helpText { display: grid; gap: 6px; }
+.helpText p { margin: 0; font-size: 14px; line-height: 1.65; }
+.helpText ul { margin: 4px 0 0; padding-left: 18px; display: grid; gap: 5px; }
+.helpText li { font-size: 13px; line-height: 1.5; color: var(--muted); }
+.helpText strong { color: var(--text); }
+
+/* Visual panel */
+.helpVisual {
+  background: rgba(255,255,255,0.025);
+  border: 1px solid var(--panelBorder);
+  border-radius: 12px;
+  padding: 16px;
+  min-height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+html[data-theme="light"] .helpVisual { background: rgba(15,23,42,0.025); }
+
+/* ── Mini kanban preview ──────────────────────────────────────────── */
+.helpMiniKanban { display: flex; gap: 8px; width: 100%; }
+.helpMiniCol {
+  flex: 1;
+  border: 1px solid rgba(255,255,255,0.10);
+  border-radius: 10px;
+  padding: 8px;
+  background: rgba(255,255,255,0.025);
+  min-width: 0;
+}
+html[data-theme="light"] .helpMiniCol { border-color: rgba(15,23,42,0.10); background: rgba(15,23,42,0.02); }
+.helpMiniColHeader {
+  font-size: 10px;
+  font-weight: 700;
+  margin-bottom: 6px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+html[data-theme="light"] .helpMiniColHeader { border-bottom-color: rgba(15,23,42,0.08); }
+.helpMiniCard {
+  background: rgba(15,20,31,0.88);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 7px;
+  padding: 5px 7px;
+  font-size: 10px;
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: var(--text);
+}
+html[data-theme="light"] .helpMiniCard { background: rgba(255,255,255,0.95); border-color: rgba(15,23,42,0.14); }
+.helpMiniCard.accent { border-color: var(--accent); background: rgba(41,182,246,0.08); }
+html[data-theme="light"] .helpMiniCard.accent { border-color: #2563eb; background: rgba(37,99,235,0.07); }
+
+/* ── Task card anatomy ────────────────────────────────────────────── */
+.helpCardAnatomy { width: 100%; display: grid; gap: 10px; }
+.helpAnatomyCard {
+  background: rgba(15,20,31,0.88);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 12px;
+  padding: 10px 12px;
+  display: grid;
+  gap: 5px;
+}
+html[data-theme="light"] .helpAnatomyCard { background: rgba(255,255,255,0.95); border-color: rgba(15,23,42,0.14); }
+.helpAnatomyTitle { font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 5px; }
+.helpAnatomyDesc { font-size: 11px; color: var(--muted); line-height: 1.35; }
+.helpAnatomyMeta { display: flex; gap: 6px; align-items: center; }
+.helpAnatomyLegend { display: flex; gap: 12px; flex-wrap: wrap; }
+.helpAnatomyLegendRow { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--muted); }
+.helpAnatomyDot { width: 8px; height: 8px; border-radius: 999px; flex-shrink: 0; }
+.helpAnatomyDot.accent { background: var(--accent); }
+.helpAnatomyDot.muted  { background: rgba(255,255,255,0.30); }
+html[data-theme="light"] .helpAnatomyDot.muted { background: rgba(15,23,42,0.30); }
+.helpAnatomyDot.pill   { background: rgba(255,255,255,0.14); border-radius: 999px; width: 18px; height: 8px; }
+
+/* ── Drag demo ────────────────────────────────────────────────────── */
+.helpDragDemo {
+  position: relative;
+  width: 100%;
+  height: 90px;
+  display: flex;
+  gap: 10px;
+}
+.helpDragCol {
+  flex: 1;
+  border: 1px solid rgba(255,255,255,0.10);
+  border-radius: 8px;
+  padding: 6px 8px;
+  background: rgba(255,255,255,0.025);
+  position: relative;
+  overflow: hidden;
+}
+.helpDragColDrop {
+  border-color: var(--accent);
+  background: rgba(41,182,246,0.07);
+  box-shadow: 0 0 0 1px rgba(41,182,246,0.3) inset;
+}
+html[data-theme="light"] .helpDragColDrop { background: rgba(37,99,235,0.06); }
+.helpDragColLabel { font-size: 10px; font-weight: 700; color: var(--muted); margin-bottom: 6px; }
+.helpDragCard {
+  background: rgba(15,20,31,0.9);
+  border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 8px;
+  padding: 5px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text);
+  position: absolute;
+  top: 26px;
+  left: 8px;
+  width: calc(50% - 18px);
+  animation: helpDragAnim 3.2s ease-in-out infinite;
+  transform-origin: center;
+}
+html[data-theme="light"] .helpDragCard { background: rgba(255,255,255,0.95); border-color: rgba(15,23,42,0.14); }
+@keyframes helpDragAnim {
+  0%,  18% { transform: translate(0,0) rotate(0deg) scale(1);    opacity: 1; box-shadow: none; }
+  32%       { transform: translate(0,-14px) rotate(2deg) scale(1.06); opacity: 0.88; box-shadow: 0 10px 28px rgba(0,0,0,0.5); }
+  68%       { transform: translate(calc(100% + 18px),-14px) rotate(2deg) scale(1.06); opacity: 0.88; box-shadow: 0 10px 28px rgba(0,0,0,0.5); }
+  82%, 100% { transform: translate(calc(100% + 18px),0) rotate(0deg) scale(1); opacity: 1; box-shadow: none; }
+}
+
+/* ── Long-press demo ──────────────────────────────────────────────── */
+.helpLongPressDemo { display: flex; flex-direction: column; align-items: stretch; gap: 12px; width: 100%; }
+.helpLongPressCard {
+  background: rgba(15,20,31,0.9);
+  border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 10px;
+  padding: 8px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+  animation: helpLongPressAnim 3.2s ease-in-out infinite;
+}
+html[data-theme="light"] .helpLongPressCard { background: rgba(255,255,255,0.95); border-color: rgba(15,23,42,0.14); }
+@keyframes helpLongPressAnim {
+  0%,  15% { box-shadow: none; border-color: rgba(255,255,255,0.14); opacity: 1; }
+  45%       { box-shadow: 0 0 0 3px rgba(41,182,246,0.55); border-color: var(--accent); opacity: 1; }
+  65%, 80%  { box-shadow: 0 0 0 3px rgba(41,182,246,0.55); border-color: var(--accent); opacity: 0.30; }
+  100%      { box-shadow: none; border-color: rgba(255,255,255,0.14); opacity: 1; }
+}
+.helpLongPressSteps { display: flex; align-items: center; gap: 4px; justify-content: center; }
+.helpLongPressStep {
+  font-size: 10px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--panelBorder);
+  background: rgba(255,255,255,0.04);
+  color: var(--muted);
+  white-space: nowrap;
+}
+.helpLongPressStep1 { animation: helpStepFade 3.2s ease-in-out infinite 0s; }
+.helpLongPressStep2 { animation: helpStepFade 3.2s ease-in-out infinite 0.3s; border-color: rgba(41,182,246,0.4); color: var(--accent); }
+.helpLongPressStep3 { animation: helpStepFade 3.2s ease-in-out infinite 0.6s; }
+.helpLongPressArrow { color: var(--muted); font-size: 12px; }
+@keyframes helpStepFade {
+  0%, 40% { opacity: 0.4; }
+  55%, 90% { opacity: 1; }
+  100%     { opacity: 0.4; }
+}
+
+/* ── Graph preview ────────────────────────────────────────────────── */
+.helpGraphPreview {
+  width: 100%;
+  height: 200px;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+/* ── Groups visual ────────────────────────────────────────────────── */
+.helpGroupRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 8px;
+  background: rgba(255,255,255,0.025);
+  font-size: 12px;
+}
+html[data-theme="light"] .helpGroupRow { border-color: rgba(15,23,42,0.10); background: rgba(15,23,42,0.02); }
+.helpGroupRow.accent { border-color: rgba(41,182,246,0.30); background: rgba(41,182,246,0.05); }
+.helpGroupRow.dashed { border-style: dashed; opacity: 0.7; justify-content: center; }
+.helpGroupDot { width: 8px; height: 8px; border-radius: 999px; flex-shrink: 0; }
+.helpGroupName { font-weight: 600; flex: 1; }
+.helpGroupActions { font-size: 11px; color: var(--muted); letter-spacing: 2px; }
+
+/* ── Keyboard shortcut grid ───────────────────────────────────────── */
+.helpKbdGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; width: 100%; }
+@media (max-width: 520px) { .helpKbdGrid { grid-template-columns: 1fr; } }
+.helpKbdRow { display: flex; align-items: center; gap: 6px; font-size: 12px; }
+.helpKbdLabel { color: var(--muted); flex: 1; font-size: 11px; }
+kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 7px;
+  border-radius: 6px;
+  border: 1px solid rgba(255,255,255,0.18);
+  background: rgba(255,255,255,0.07);
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text);
+  box-shadow: 0 2px 0 rgba(0,0,0,0.35);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+html[data-theme="light"] kbd {
+  border-color: rgba(15,23,42,0.22);
+  background: rgba(255,255,255,0.92);
+  box-shadow: 0 2px 0 rgba(15,23,42,0.14);
+  color: rgba(15,23,42,0.88);
 }

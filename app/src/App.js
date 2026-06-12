@@ -3266,7 +3266,7 @@ function App() {
                         key=${t.id}
                         data-task-id=${t.id}
                         className=${"taskCard" + (draggingTaskId === t.id ? " dragging" : "") + (selectedTaskId === t.id ? " taskSelected" : "")}
-                        draggable="true"
+                        draggable=${selectedTaskId ? "false" : "true"}
                         onMouseDown=${selectedTaskId ? (e) => {
                           if (e.button !== 0) return;
                           __mouseDrag = {
